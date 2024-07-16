@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34511.84
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarDealership.Bot.Api", "CarDealership.Bot.Api\CarDealership.Bot.Api.csproj", "{7AD161A2-2F4C-418D-8A70-78D360B4CF2C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CarDealership.Bot.DataAccess", "CarDealership.Bot.DataAccess\CarDealership.Bot.DataAccess.csproj", "{3E92D1D8-A860-414B-868F-FA1B029B1D35}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7AD161A2-2F4C-418D-8A70-78D360B4CF2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AD161A2-2F4C-418D-8A70-78D360B4CF2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AD161A2-2F4C-418D-8A70-78D360B4CF2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AD161A2-2F4C-418D-8A70-78D360B4CF2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E92D1D8-A860-414B-868F-FA1B029B1D35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E92D1D8-A860-414B-868F-FA1B029B1D35}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E92D1D8-A860-414B-868F-FA1B029B1D35}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E92D1D8-A860-414B-868F-FA1B029B1D35}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4F82D7AD-FAA8-46E2-ADF3-68D636338476}
+	EndGlobalSection
+EndGlobal
