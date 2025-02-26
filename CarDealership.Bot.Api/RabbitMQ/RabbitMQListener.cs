@@ -7,6 +7,8 @@ using System.Text.Json;
 using CarDealership.Bot.DataAccess.Repositories;
 using CarDealership.Bot.Api.Constants;
 using CarDealership.Bot.Api.NotifHandlers;
+using RabbitMQ.Client.Exceptions;
+using Microsoft.Extensions.Options;
 
 
 namespace CarDealership.Bot.Api.RabbitMQ
@@ -18,19 +20,26 @@ namespace CarDealership.Bot.Api.RabbitMQ
         private readonly IModel _channel;
         private readonly TelegramBotClient _botClient;
 
-        public RabbitMQListener(IServiceScopeFactory serviceScopeFactory, TelegramBotClient botClient, IConfiguration configuration, Dictionary<string, string> notifications)
+        public RabbitMQListener
+        (
+            IServiceScopeFactory serviceScopeFactory,
+            TelegramBotClient botClient,
+            IConfiguration configuration,
+            IOptions<RabbitMQConnectionOptions> options,
+            Dictionary<string, string> notifications
+        )
         {
             _serviceScopeFactory = serviceScopeFactory;
 
             var factory = new ConnectionFactory()
             {
-                HostName = configuration["RabbitMQ:HostName"],
-                UserName = configuration["RabbitMQ:UserName"],
-                Password = configuration["RabbitMQ:Password"]
+                HostName = options.Value.HostName,
+                UserName = options.Value.UserName,
+                Password = options.Value.Password
             };
 
-            _queueName = configuration["RabbitMQ:Queues:CDQueue"];
-            var connection = factory.CreateConnection();
+            _queueName = configuration["RabbitQueues:CDQueue"];
+            var connection = EnsureRabbitMQConnection(factory) ?? throw new Exception("Cannot start RabbitMQListener");
             _channel = connection.CreateModel();
             _channel.QueueDeclare(queue: _queueName,
                                   durable: false,
@@ -39,6 +48,25 @@ namespace CarDealership.Bot.Api.RabbitMQ
                                   arguments: null);
 
             _botClient = botClient;
+        }
+
+        private static IConnection? EnsureRabbitMQConnection(ConnectionFactory factory, int maxRetries = 5, int delayMilliseconds = 5000)
+        {
+            int attempt = 0;
+
+            while (attempt < maxRetries)
+            {
+                try
+                {
+                    return factory.CreateConnection();
+                }
+                catch (BrokerUnreachableException e)
+                {
+                    attempt++;
+                }
+            }
+
+            return null;
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)

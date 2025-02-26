@@ -2,6 +2,7 @@ using CarDealership.Bot.Api.Constants;
 using CarDealership.Bot.Api.Controllers;
 using CarDealership.Bot.Api.NotifHandlers;
 using CarDealership.Bot.Api.RabbitMQ;
+using CarDealership.Bot.Api.Settings;
 using CarDealership.Bot.DataAccess;
 using System.Text.Json;
 using Telegram.Bot;
@@ -13,8 +14,10 @@ var config = builder.Configuration;
 
 services.AddControllers();
 
-services.Configure<MongoConnectionOptions>(config.GetSection(nameof(MongoConnectionOptions)));
+services.ConfigureAppSettings(config);
+
 services.AddSingleton<CDBotDbContext>();
+
 
 var telegramBotToken = config["TelegramBotToken"];
 
