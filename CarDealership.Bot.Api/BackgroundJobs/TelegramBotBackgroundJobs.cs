@@ -9,7 +9,6 @@ using System.Text.Json;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace CarDealership.Bot.Api.Controllers
 {

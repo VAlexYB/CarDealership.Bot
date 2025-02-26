@@ -1,5 +1,4 @@
 ﻿using IModel = RabbitMQ.Client.IModel;
-using Microsoft.EntityFrameworkCore.Metadata;
 using RabbitMQ.Client;
 using Telegram.Bot;
 using RabbitMQ.Client.Events;

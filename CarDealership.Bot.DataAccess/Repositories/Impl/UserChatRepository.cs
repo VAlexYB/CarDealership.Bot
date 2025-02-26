@@ -1,5 +1,5 @@
 ﻿using CarDealership.Bot.DataAccess.Entities;
-using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
 
 namespace CarDealership.Bot.DataAccess.Repositories.Impl
 {
@@ -15,33 +15,34 @@ namespace CarDealership.Bot.DataAccess.Repositories.Impl
         public async Task AddOrUpdateUserChatMapping(string phoneNumber, long chatId)
         {
             var userChat = await _context.UserChatMappings
-                .FirstOrDefaultAsync(uc => uc.PhoneNumber == phoneNumber);
+                .Find(uc => uc.PhoneNumber == phoneNumber)
+                .FirstOrDefaultAsync();
 
             if (userChat == null)
             {
                 userChat = new UserChatMapping { PhoneNumber = phoneNumber, ChatId = chatId };
-                await _context.UserChatMappings.AddAsync(userChat);
+                await _context.UserChatMappings.InsertOneAsync(userChat);
             }
             else
             {
                 userChat.ChatId = chatId;
-                _context.UserChatMappings.Update(userChat);
+                await _context.UserChatMappings.ReplaceOneAsync(uc => uc.PhoneNumber == phoneNumber, userChat);
             }
-            await _context.SaveChangesAsync();
         }
 
         public async Task<long?> GetChatIdByPhoneNumber(string phoneNumber)
         {
             var userChat = await _context.UserChatMappings
-                .FirstOrDefaultAsync(uc => uc.PhoneNumber == phoneNumber);
+                .Find(uc => uc.PhoneNumber == phoneNumber)
+                .FirstOrDefaultAsync();
 
             return userChat?.ChatId;
         }
 
         public async Task<bool> HasProvidedContact(long chatId)
         {
-            var hasProvidedContact = await _context.UserChatMappings.AnyAsync(uc => uc.ChatId == chatId);
-            return hasProvidedContact;
+            var count = await _context.UserChatMappings.CountDocumentsAsync(uc => uc.ChatId == chatId);
+            return count > 0;
         }
     }
 }

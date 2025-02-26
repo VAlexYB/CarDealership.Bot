@@ -1,13 +1,18 @@
 ﻿using CarDealership.Bot.DataAccess.Entities;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 
 namespace CarDealership.Bot.DataAccess
 {
-    public class CDBotDbContext : DbContext
+    public class CDBotDbContext
     {
-        public CDBotDbContext(DbContextOptions<CDBotDbContext> options) : base(options)
+        private IMongoDatabase _database;
+        public CDBotDbContext(IOptions<MongoConnectionOptions> options)
         {
+            MongoClient client = new MongoClient(options.Value.ConnectionString);
+            _database = client.GetDatabase(options.Value.DBName);
         }
-        public DbSet<UserChatMapping> UserChatMappings { get; set; }
+        public IMongoCollection<UserChatMapping> UserChatMappings =>
+               _database.GetCollection<UserChatMapping>(nameof(UserChatMapping));
     }
 }

@@ -4,12 +4,15 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
+ENV ASPNETCORE_ENVIRONMENT=Development
+
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
+ARG BUILD_CONFIGURATION=Debug
 WORKDIR /src
-COPY ["CarDealership.Bot/CarDealership.Bot.Api/CarDealership.Bot.Api.csproj", "CarDealership.Bot.Api/"]
-COPY ["CarDealership.Bot/CarDealership.Bot.DataAccess/CarDealership.Bot.DataAccess.csproj", "CarDealership.Bot.DataAccess/"]
-RUN dotnet restore "./CarDealership.Bot.Api/./CarDealership.Bot.Api.csproj"
+COPY ["CarDealership.Bot.Api/CarDealership.Bot.Api.csproj", "CarDealership.Bot.Api/"]
+COPY ["CarDealership.Bot.DataAccess/CarDealership.Bot.DataAccess.csproj", "CarDealership.Bot.DataAccess/"]
+RUN dotnet restore "./CarDealership.Bot.Api/CarDealership.Bot.Api.csproj"
+
 COPY . .
 WORKDIR "/src/CarDealership.Bot.Api"
 RUN dotnet build "./CarDealership.Bot.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build

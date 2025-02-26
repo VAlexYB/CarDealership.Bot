@@ -3,23 +3,21 @@ using CarDealership.Bot.Api.Controllers;
 using CarDealership.Bot.Api.NotifHandlers;
 using CarDealership.Bot.Api.RabbitMQ;
 using CarDealership.Bot.DataAccess;
-using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using Telegram.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
+
 var services = builder.Services;
 var config = builder.Configuration;
 
 services.AddControllers();
 
-services.AddDbContext<CDBotDbContext>(
-        options =>
-        {
-            options.UseNpgsql(builder.Configuration.GetConnectionString(nameof(CDBotDbContext)));
-        });
+services.Configure<MongoConnectionOptions>(config.GetSection(nameof(MongoConnectionOptions)));
+services.AddSingleton<CDBotDbContext>();
 
 var telegramBotToken = config["TelegramBotToken"];
+
 var botClient = new TelegramBotClient(telegramBotToken);
 
 
