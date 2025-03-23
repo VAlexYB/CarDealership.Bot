@@ -9,6 +9,9 @@ using CarDealership.Bot.Api.Constants;
 using CarDealership.Bot.Api.NotifHandlers;
 using RabbitMQ.Client.Exceptions;
 using Microsoft.Extensions.Options;
+using CarDealership.Shared.Messaging;
+using CarDealership.Bot.Api.External.GrpcClients.Abstraction;
+using Telegram.Bot.Types;
 
 
 namespace CarDealership.Bot.Api.RabbitMQ
@@ -62,6 +65,7 @@ namespace CarDealership.Bot.Api.RabbitMQ
                 }
                 catch (BrokerUnreachableException e)
                 {
+                    Thread.Sleep(delayMilliseconds);
                     attempt++;
                 }
             }
@@ -92,6 +96,18 @@ namespace CarDealership.Bot.Api.RabbitMQ
                         var parameters = new Dictionary<string, string> { { NotificationConstants.orderId, messageInfo.Id } };
                         string notificationMessage = NotifFormatter.FormatNotif(notificationTemplate, parameters);
                         await _botClient.SendTextMessageAsync(chatId.Value, notificationMessage);
+
+                        var storageGrpcServiceClient = scope.ServiceProvider.GetRequiredService<IStorageGrpcServiceClient>();
+
+                        string directory = Path.GetDirectoryName(messageInfo.Path)?.Replace("\\", "/");
+                        string filename = Path.GetFileName(messageInfo.Path);
+
+                        Stream fileStream = await storageGrpcServiceClient.DownloadFile(directory, filename);
+
+                        if (fileStream != null)
+                        {
+                            await _botClient.SendDocumentAsync(chatId.Value, InputFile.FromStream(fileStream, filename));
+                        }
                     }
                 }
             };
