@@ -53,7 +53,7 @@ namespace CarDealership.Bot.Api.RabbitMQ
             _botClient = botClient;
         }
 
-        private static IConnection? EnsureRabbitMQConnection(ConnectionFactory factory, int maxRetries = 5, int delayMilliseconds = 5000)
+        private static IConnection? EnsureRabbitMQConnection(ConnectionFactory factory, int maxRetries = 5, int delayMilliseconds = 10000)
         {
             int attempt = 0;
 
@@ -97,16 +97,19 @@ namespace CarDealership.Bot.Api.RabbitMQ
                         string notificationMessage = NotifFormatter.FormatNotif(notificationTemplate, parameters);
                         await _botClient.SendTextMessageAsync(chatId.Value, notificationMessage);
 
-                        var storageGrpcServiceClient = scope.ServiceProvider.GetRequiredService<IStorageGrpcServiceClient>();
-
-                        string directory = Path.GetDirectoryName(messageInfo.Path)?.Replace("\\", "/");
-                        string filename = Path.GetFileName(messageInfo.Path);
-
-                        Stream fileStream = await storageGrpcServiceClient.DownloadFile(directory, filename);
-
-                        if (fileStream != null)
+                        if (messageInfo.Path != null)
                         {
-                            await _botClient.SendDocumentAsync(chatId.Value, InputFile.FromStream(fileStream, filename));
+                            var storageGrpcServiceClient = scope.ServiceProvider.GetRequiredService<IStorageGrpcServiceClient>();
+
+                            string directory = Path.GetDirectoryName(messageInfo.Path)?.Replace("\\", "/");
+                            string filename = Path.GetFileName(messageInfo.Path);
+
+                            Stream fileStream = await storageGrpcServiceClient.DownloadFile(directory, filename);
+
+                            if (fileStream != null)
+                            {
+                                await _botClient.SendDocumentAsync(chatId.Value, InputFile.FromStream(fileStream, filename));
+                            }
                         }
                     }
                 }
